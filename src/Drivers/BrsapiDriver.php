@@ -53,8 +53,6 @@ class BrsapiDriver extends AbstractDriver
         Currency::IR_COIN_EMAMI->value => ['type' => 'gold', 'key' => 'IR_COIN_EMAMI'],
         Currency::IR_COIN_BAHAR->value => ['type' => 'gold', 'key' => 'IR_COIN_BAHAR'],
         Currency::SILVER_OUNCE->value => ['type' => 'commodity', 'key' => 'XAGUSD'],
-        Currency::PLATINUM_OUNCE->value => ['type' => 'gold', 'key' => 'XPTUSD'],
-        Currency::PALLADIUM_OUNCE->value => ['type' => 'gold', 'key' => 'XPDUSD'],
     ];
 
     /**

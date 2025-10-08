@@ -57,7 +57,7 @@ class TgnDriver extends AbstractDriver
             // Get the key for this currency
             $key = $this->keyMap[$currency->value] ?? null;
 
-            if (!$key || !isset($data[$key])) {
+            if (! $key || ! isset($data[$key])) {
                 $this->handleApiError(
                     new \Exception("Currency {$currency->value} not found in TGN response"),
                     'Currency data not available'
@@ -68,8 +68,8 @@ class TgnDriver extends AbstractDriver
 
             // Parse timestamp from TimeRead field
             $timestamp = isset($data['TimeRead'])
-                ? \DateTime::createFromFormat('Y/m/d H:i:s', $data['TimeRead']) ?: new \DateTime()
-                : new \DateTime();
+                ? \DateTime::createFromFormat('Y/m/d H:i:s', $data['TimeRead']) ?: new \DateTime
+                : new \DateTime;
 
             return new PriceData(
                 currency: $currency,
@@ -97,7 +97,7 @@ class TgnDriver extends AbstractDriver
     {
         $cacheKey = "{$this->cachePrefix}:{$this->getName()}:api_response";
 
-        if (!$this->cacheEnabled) {
+        if (! $this->cacheEnabled) {
             return $this->fetchApiResponse();
         }
 
@@ -114,7 +114,7 @@ class TgnDriver extends AbstractDriver
         $endpoint = "/Pr/Get/{$this->username}/{$this->apiKey}";
         $response = $this->getHttpClient()->get($endpoint);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             $this->handleApiError(
                 new \Exception($response->body()),
                 'TGN API request failed'

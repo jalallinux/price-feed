@@ -65,8 +65,6 @@ return [
                 // Precious Metals (prices in Toman)
                 Currency::IR_GOLD_18,
                 Currency::SILVER_OUNCE,
-                Currency::PLATINUM_OUNCE,
-                Currency::PALLADIUM_OUNCE,
             ],
             'options' => [
                 'timeout' => 10,
