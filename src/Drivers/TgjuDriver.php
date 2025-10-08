@@ -14,38 +14,40 @@ class TgjuDriver extends AbstractDriver
      */
     protected array $keyMap = [
         // Cryptocurrencies (all in IRR)
-        'BTC' => 'btc-irr',
-        'ETH' => 'eth-irr',
-        'USDT' => 'usdt-irr',
-        'BNB' => 'crypto-binance-coin-irr',
-        'XRP' => 'xrp-irr',
-        'ADA' => 'crypto-cardano-irr',
-        'DOGE' => 'crypto-dogecoin-irr',
-        'SOL' => 'crypto-solana-irr',
-        'TRX' => 'crypto-tron-irr',
-        'DOT' => 'crypto-polkadot-irr',
-        // 'MATIC' => 'crypto-polygon-irr', // Not available in TGJU with IRR
-        'LTC' => 'crypto-litecoin-irr',
-        'SHIB' => 'crypto-shiba-inu-irr',
-        'AVAX' => 'crypto-avalanche-irr',
-        'UNI' => 'crypto-uniswap', // Available but without -irr suffix
-        'LINK' => 'crypto-chainlink-irr',
+        Currency::BTC->value => 'btc-irr',
+        Currency::ETH->value => 'eth-irr',
+        Currency::USDT->value => 'usdt-irr',
+        Currency::BNB->value => 'crypto-binance-coin-irr',
+        Currency::XRP->value => 'xrp-irr',
+        Currency::ADA->value => 'crypto-cardano-irr',
+        Currency::DOGE->value => 'crypto-dogecoin-irr',
+        Currency::SOL->value => 'crypto-solana-irr',
+        Currency::TRX->value => 'crypto-tron-irr',
+        Currency::DOT->value => 'crypto-polkadot-irr',
+        Currency::LTC->value => 'crypto-litecoin-irr',
+        Currency::SHIB->value => 'crypto-shiba-inu-irr',
+        Currency::AVAX->value => 'crypto-avalanche-irr',
+        Currency::UNI->value => 'crypto-uniswap',
+        Currency::LINK->value => 'crypto-chainlink-irr',
 
         // Fiat Currencies (to IRR)
-        'USD' => 'price_dollar_rl',
-        'EUR' => 'price_eur',
-        'GBP' => 'price_gbp',
-        'JPY' => 'usd-jpy-ask',
-        'CNY' => 'usd-cny-ask',
-        'AUD' => 'price_aud',
-        'CAD' => 'usd-cad-ask',
-        'CHF' => 'usd-chf-ask',
-        'AED' => 'price_aed',
-        'TRY' => 'price_try',
+        Currency::USD->value => 'price_dollar_rl',
+        Currency::EUR->value => 'price_eur',
+        Currency::GBP->value => 'price_gbp',
+        Currency::JPY->value => 'usd-jpy-ask',
+        Currency::CNY->value => 'usd-cny-ask',
+        Currency::AUD->value => 'price_aud',
+        Currency::CAD->value => 'usd-cad-ask',
+        Currency::CHF->value => 'usd-chf-ask',
+        Currency::AED->value => 'price_aed',
+        Currency::TRY->value => 'price_try',
 
         // Precious Metals (in IRR)
-        'GOLD' => 'geram18', // Gold per gram (18k)
-        'SILVER' => 'silver', // Silver per ounce
+        Currency::IR_GOLD_18->value => 'geram18',
+        Currency::IR_GOLD_24->value => 'geram24',
+        Currency::SILVER_OUNCE->value => 'silver',
+        Currency::SILVER_925->value => 'silver_925',
+        Currency::SILVER_999->value => 'silver_999',
     ];
 
     /**

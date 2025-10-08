@@ -63,32 +63,13 @@ return [
                 Currency::AED,
                 Currency::TRY,
                 // Precious Metals (prices in Toman)
-                Currency::GOLD,
-                Currency::SILVER,
-                Currency::PLATINUM,
-                Currency::PALLADIUM,
+                Currency::IR_GOLD_18,
+                Currency::SILVER_OUNCE,
+                Currency::PLATINUM_OUNCE,
+                Currency::PALLADIUM_OUNCE,
             ],
             'options' => [
                 'timeout' => 10,
-            ],
-        ],
-
-        'goldapi' => [
-            'driver' => \JalalLinuX\PriceFeed\Drivers\GoldApiDriver::class,
-            'api_key' => env('GOLDAPI_API_KEY'),
-            'base_url' => 'https://www.goldapi.io/api',
-            'cache_enabled' => (bool) env('GOLDAPI_CACHE_ENABLED', true),
-            'cache_ttl' => env('GOLDAPI_CACHE_TTL', 300), // Cache duration in seconds (5 minutes for precious metals)
-            'cache_prefix' => 'price_feed',
-            'currencies' => [
-                Currency::GOLD,
-                Currency::SILVER,
-                Currency::PLATINUM,
-                Currency::PALLADIUM,
-            ],
-            'options' => [
-                'timeout' => 10,
-                'base_currency' => 'USD',
             ],
         ],
 
@@ -112,8 +93,35 @@ return [
                 Currency::AED,
                 Currency::TRY,
                 // Precious Metals (prices in IRR)
-                Currency::GOLD,
-                Currency::SILVER,
+                Currency::IR_GOLD_18,
+                Currency::SILVER_OUNCE,
+            ],
+            'options' => [
+                'timeout' => 10,
+            ],
+        ],
+
+        'tgn' => [
+            'driver' => \JalalLinuX\PriceFeed\Drivers\TgnDriver::class,
+            'username' => env('TGN_USERNAME'),
+            'api_key' => env('TGN_API_KEY'),
+            'base_url' => 'https://webservice.tgnsrv.ir',
+            'cache_enabled' => (bool) env('TGN_CACHE_ENABLED', true),
+            'cache_ttl' => env('TGN_CACHE_TTL', 120), // Cache duration in seconds (2 minutes for Iranian market)
+            'cache_prefix' => 'price_feed',
+            'currencies' => [
+                // Fiat Currencies (exchange rates to IRR)
+                Currency::USD,
+                Currency::EUR,
+                Currency::AED,
+                // Precious Metals and Coins (prices in IRR)
+                Currency::GOLD_OUNCE,
+                Currency::IR_GOLD_18,
+                Currency::IR_COIN_1G,
+                Currency::IR_COIN_QUARTER,
+                Currency::IR_COIN_HALF,
+                Currency::IR_COIN_EMAMI,
+                Currency::IR_COIN_BAHAR,
             ],
             'options' => [
                 'timeout' => 10,

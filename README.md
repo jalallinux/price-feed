@@ -2,7 +2,7 @@
 
 **Price Feed** is a Laravel package for fetching real-time prices of multiple asset types — including cryptocurrencies, fiat currencies, gold, silver, and metal derivatives — through a unified, driver-based architecture.
 
-Each driver connects to a third-party provider (such as TGJU, Brsapi, or GoldAPI) and implements a shared interface. This makes it easy to extend, switch, or customize sources dynamically — all through Laravel's powerful configuration system.
+Each driver connects to a third-party provider (such as TGJU, Brsapi, or TGN) and implements a shared interface. This makes it easy to extend, switch, or customize sources dynamically — all through Laravel's powerful configuration system.
 
 ---
 
@@ -42,70 +42,6 @@ Publish and customize the configuration file:
 php artisan vendor:publish --tag="price-feed-config"
 ```
 
-Example of the published config:
-
-```php
-return [
-
-    'default' => env('PRICE_FEED_DRIVER', 'tgju'),
-
-    'drivers' => [
-        'brsapi' => [
-            'driver' => \JalalLinuX\PriceFeed\Drivers\BrsapiDriver::class,
-            'api_key' => env('BRSAPI_API_KEY'),
-            'base_url' => 'https://brsapi.ir',
-            'cache_enabled' => env('BRSAPI_CACHE_ENABLED', true),
-            'cache_ttl' => env('BRSAPI_CACHE_TTL', 120), // seconds
-            'cache_prefix' => 'price_feed',
-            'currencies' => [
-                Currency::BTC,
-                Currency::ETH,
-                Currency::USD,
-                Currency::GOLD,
-                // ...
-            ],
-            'options' => [
-                'timeout' => 10,
-            ],
-        ],
-        'tgju' => [
-            'driver' => \JalalLinuX\PriceFeed\Drivers\TgjuDriver::class,
-            'api_key' => null, // Free API
-            'base_url' => 'https://call5.tgju.org',
-            'cache_enabled' => env('TGJU_CACHE_ENABLED', true),
-            'cache_ttl' => env('TGJU_CACHE_TTL', 120), // seconds
-            'cache_prefix' => 'price_feed',
-            'currencies' => [
-                Currency::BTC,
-                Currency::USD,
-                Currency::GOLD,
-                // ...
-            ],
-            'options' => [
-                'timeout' => 10,
-            ],
-        ],
-        'goldapi' => [
-            'driver' => \JalalLinuX\PriceFeed\Drivers\GoldApiDriver::class,
-            'api_key' => env('GOLDAPI_API_KEY'),
-            'base_url' => 'https://www.goldapi.io/api',
-            'cache_enabled' => env('GOLDAPI_CACHE_ENABLED', true),
-            'cache_ttl' => env('GOLDAPI_CACHE_TTL', 300),
-            'cache_prefix' => 'price_feed',
-            'currencies' => [
-                Currency::GOLD,
-                Currency::SILVER,
-                // ...
-            ],
-            'options' => [
-                'timeout' => 10,
-            ],
-        ],
-    ],
-
-];
-```
-
 ---
 
 ## 🧪 Usage Example
@@ -143,8 +79,8 @@ $btcPrice = PriceFeed::getPrice(Currency::BTC, 'brsapi');
 // Get USD price in IRR from TGJU (Iranian market)
 $usdIRR = PriceFeed::getPrice(Currency::USD, 'tgju');
 
-// Get Gold price from GoldAPI (international)
-$goldPrice = PriceFeed::getPrice(Currency::GOLD, 'goldapi');
+// Get USD price in IRR from TGN (Iranian market)
+$usdIRR = PriceFeed::getPrice(Currency::USD, 'tgn');
 
 // Get Ethereum price from Brsapi
 $ethPrice = PriceFeed::getPrice(Currency::ETH, 'brsapi');
@@ -172,31 +108,6 @@ if ($tgju->supports(Currency::BTC)) {
 
 The package includes built-in caching to reduce API calls and improve performance. Each driver can have its own cache settings:
 
-**Per-Driver Configuration:**
-
-```php
-'drivers' => [
-    'brsapi' => [
-        // ...
-        'cache_enabled' => env('BRSAPI_CACHE_ENABLED', true),
-        'cache_ttl' => env('BRSAPI_CACHE_TTL', 120), // Cache for 2 minutes
-        'cache_prefix' => 'price_feed',
-    ],
-    'tgju' => [
-        // ...
-        'cache_enabled' => env('TGJU_CACHE_ENABLED', true),
-        'cache_ttl' => env('TGJU_CACHE_TTL', 120), // Cache for 2 minutes
-        'cache_prefix' => 'price_feed',
-    ],
-    'goldapi' => [
-        // ...
-        'cache_enabled' => env('GOLDAPI_CACHE_ENABLED', true),
-        'cache_ttl' => env('GOLDAPI_CACHE_TTL', 300), // Cache for 5 minutes
-        'cache_prefix' => 'price_feed',
-    ],
-],
-```
-
 **Environment Variables:**
 
 ```env
@@ -207,8 +118,12 @@ BRSAPI_CACHE_TTL=120
 TGJU_CACHE_ENABLED=true
 TGJU_CACHE_TTL=120
 
-GOLDAPI_CACHE_ENABLED=true
-GOLDAPI_CACHE_TTL=300
+TGN_CACHE_ENABLED=true
+TGN_CACHE_TTL=120
+
+TGN_USERNAME=
+TGN_API_KEY=
+TGN_CACHE_TTL=120
 ```
 
 **Benefits:**

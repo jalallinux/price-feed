@@ -21,7 +21,7 @@ Add API keys to your `.env`:
 ```env
 TGJU_API_KEY=your_key_here
 BRSAPI_API_KEY=your_key_here
-GOLDAPI_API_KEY=your_key_here
+TGN_API_KEY=your_key_here
 ```
 
 ## Basic Usage
@@ -87,11 +87,11 @@ echo "Market Cap: $" . $btc->marketCap . "\n";
 
 ## Available Drivers
 
-| Driver    | Asset Type      | Requires API Key |
-|-----------|-----------------|------------------|
-| `tgju`    | TGJU            | Yes |
-| `brsapi`  | BRSAPI          | Yes |
-| `goldapi` | Precious Metals | Yes |
+| Driver   | Asset Type | Requires API Key |
+|----------|------------|------------------|
+| `tgju`   | TGJU       | Yes |
+| `brsapi` | BRSAPI     | Yes |
+| `tgn`    | TGN        | Yes |
 
 ## Common Tasks
 

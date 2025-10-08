@@ -36,10 +36,22 @@ enum Currency: string
     case TRY = 'TRY';
 
     // Precious Metals
-    case GOLD = 'GOLD';
-    case SILVER = 'SILVER';
-    case PLATINUM = 'PLATINUM';
-    case PALLADIUM = 'PALLADIUM';
+    case GOLD_OUNCE = 'GOLD_OUNCE';
+    case IR_GOLD_18 = 'IR_GOLD_18';
+    case IR_GOLD_24 = 'IR_GOLD_24';
+    case IR_GOLD_MELTED = 'IR_GOLD_MELTED';
+    case IR_COIN_1G = 'IR_COIN_1G';
+    case IR_COIN_QUARTER = 'IR_COIN_QUARTER';
+    case IR_COIN_HALF = 'IR_COIN_HALF';
+    case IR_COIN_EMAMI = 'IR_COIN_EMAMI';
+    case IR_COIN_BAHAR = 'IR_COIN_BAHAR';
+
+    case SILVER_OUNCE = 'SILVER_OUNCE';
+    case SILVER_999 = 'SILVER_999';
+    case SILVER_925 = 'SILVER_925';
+
+    case PLATINUM_OUNCE = 'PLATINUM_OUNCE';
+    case PALLADIUM_OUNCE = 'PALLADIUM_OUNCE';
 
     /**
      * Get all cryptocurrency cases
@@ -92,10 +104,20 @@ enum Currency: string
     public static function preciousMetals(): array
     {
         return [
-            self::GOLD,
-            self::SILVER,
-            self::PLATINUM,
-            self::PALLADIUM,
+            self::GOLD_OUNCE,
+            self::IR_GOLD_18,
+            self::IR_GOLD_24,
+            self::IR_GOLD_MELTED,
+            self::IR_COIN_1G,
+            self::IR_COIN_QUARTER,
+            self::IR_COIN_HALF,
+            self::IR_COIN_EMAMI,
+            self::IR_COIN_BAHAR,
+            self::SILVER_OUNCE,
+            self::SILVER_999,
+            self::SILVER_925,
+            self::PLATINUM_OUNCE,
+            self::PALLADIUM_OUNCE,
         ];
     }
 

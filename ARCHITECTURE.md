@@ -84,13 +84,7 @@ PriceFeedException (base)
 
 ## Included Drivers
 
-### 1. GoldApiDriver
-
-**API:** GoldAPI
-**Supported:** Precious metals
-**Authentication:** API key via `x-access-token` header
-
-### 2. Tgju
+### 1. Tgju
 
 **API:** TGJU.org API
 **Supported:** Cryptocurrencies, Fiat currencies, Precious metals (all in IRR)
