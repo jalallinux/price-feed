@@ -95,6 +95,7 @@ class BrsapiDriver extends AbstractDriver
             return new PriceData(
                 currency: $currency,
                 price: $priceInfo['price'],
+                unit: $this->unit,
                 symbol: $currency->value,
                 change24h: $priceInfo['change_value'] ?? null,
                 changePercentage24h: $priceInfo['change_percent'] ?? null,

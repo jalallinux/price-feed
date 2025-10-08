@@ -95,6 +95,7 @@ class TgjuDriver extends AbstractDriver
             return new PriceData(
                 currency: $currency,
                 price: $price,
+                unit: $this->unit,
                 symbol: $currency->value,
                 change24h: $change,
                 changePercentage24h: $changePercentage,

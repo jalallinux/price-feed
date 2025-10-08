@@ -74,6 +74,7 @@ class TgnDriver extends AbstractDriver
             return new PriceData(
                 currency: $currency,
                 price: $price,
+                unit: $this->unit,
                 symbol: $currency->value,
                 change24h: null, // TGN doesn't provide 24h change
                 changePercentage24h: null,

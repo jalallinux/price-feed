@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use JalalLinuX\PriceFeed\Contracts\DriverInterface;
 use JalalLinuX\PriceFeed\DataTransferObjects\PriceData;
 use JalalLinuX\PriceFeed\Enums\Currency;
+use JalalLinuX\PriceFeed\Enums\CurrencyUnit;
 use JalalLinuX\PriceFeed\Exceptions\ApiException;
 
 abstract class AbstractDriver implements DriverInterface
@@ -16,6 +17,8 @@ abstract class AbstractDriver implements DriverInterface
     protected array $config;
 
     protected string $baseUrl;
+
+    protected CurrencyUnit $unit;
 
     protected ?string $apiKey;
 
@@ -33,6 +36,7 @@ abstract class AbstractDriver implements DriverInterface
     {
         $this->config = $config;
         $this->baseUrl = $config['base_url'];
+        $this->unit = $config['unit'];
         $this->apiKey = $config['api_key'] ?? null;
         $this->options = $config['options'] ?? [];
         $this->supportedCurrencies = $config['currencies'] ?? [];
@@ -41,6 +45,11 @@ abstract class AbstractDriver implements DriverInterface
         $this->cacheEnabled = $config['cache_enabled'] ?? true;
         $this->cacheTtl = $config['cache_ttl'] ?? 60;
         $this->cachePrefix = $config['cache_prefix'] ?? 'price_feed';
+    }
+
+    public function getUnit(): CurrencyUnit
+    {
+        return $this->unit;
     }
 
     /**
