@@ -30,6 +30,7 @@ return [
             'driver' => \JalalLinuX\PriceFeed\Drivers\BrsapiDriver::class,
             'api_key' => env('BRSAPI_API_KEY'),
             'base_url' => 'https://brsapi.ir',
+            'unit' => \JalalLinuX\PriceFeed\Enums\CurrencyUnit::IRT,
             'cache_enabled' => (bool) env('BRSAPI_CACHE_ENABLED', true),
             'cache_ttl' => env('BRSAPI_CACHE_TTL', 120), // Cache duration in seconds (2 minutes)
             'cache_prefix' => 'price_feed',
@@ -75,6 +76,7 @@ return [
             'driver' => \JalalLinuX\PriceFeed\Drivers\TgjuDriver::class,
             'api_key' => env('TGJU_API_KEY'),
             'base_url' => 'https://call5.tgju.org',
+            'unit' => \JalalLinuX\PriceFeed\Enums\CurrencyUnit::IRR,
             'cache_enabled' => (bool) env('TGJU_CACHE_ENABLED', true),
             'cache_ttl' => env('TGJU_CACHE_TTL', 120), // Cache duration in seconds (2 minutes for Iranian market)
             'cache_prefix' => 'price_feed',
@@ -104,6 +106,7 @@ return [
             'username' => env('TGN_USERNAME'),
             'api_key' => env('TGN_API_KEY'),
             'base_url' => 'https://webservice.tgnsrv.ir',
+            'unit' => \JalalLinuX\PriceFeed\Enums\CurrencyUnit::IRT,
             'cache_enabled' => (bool) env('TGN_CACHE_ENABLED', true),
             'cache_ttl' => env('TGN_CACHE_TTL', 120), // Cache duration in seconds (2 minutes for Iranian market)
             'cache_prefix' => 'price_feed',

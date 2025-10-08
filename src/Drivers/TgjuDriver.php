@@ -90,9 +90,7 @@ class TgjuDriver extends AbstractDriver
             $changePercentage = isset($instrumentData['dp']) ? (float) $instrumentData['dp'] : null;
 
             // Parse timestamp
-            $timestamp = isset($instrumentData['ts'])
-                ? new \DateTime($instrumentData['ts'])
-                : new \DateTime;
+            $timestamp = isset($instrumentData['ts']) ? new \DateTime($instrumentData['ts']) : new \DateTime;
 
             return new PriceData(
                 currency: $currency,
