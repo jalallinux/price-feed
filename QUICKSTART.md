@@ -1,358 +1,400 @@
 # Quick Start Guide
 
-Get up and running with Price Feed in 5 minutes!
+Get up and running with the Price Feed package in minutes.
 
 ## Installation
+
+### 1. Install via Composer
 
 ```bash
 composer require jalallinux/price-feed
 ```
 
-## Configuration
-
-Publish the config file:
+### 2. Publish Configuration
 
 ```bash
-php artisan vendor:publish --tag="price-feed-config"
+php artisan vendor:publish --provider="JalalLinuX\PriceFeed\PriceFeedServiceProvider" --tag="config"
 ```
 
-Add API keys to your `.env`:
+### 3. Configure Environment Variables
+
+Add these to your `.env` file:
 
 ```env
-TGJU_API_KEY=your_key_here
-BRSAPI_API_KEY=your_key_here
-TGN_API_KEY=your_key_here
+# Default driver (tgju, brsapi, or tgn)
+PRICE_FEED_DRIVER=tgju
+
+# TGJU Configuration (Free - No API key required)
+TGJU_CACHE_ENABLED=true
+TGJU_CACHE_TTL=120
+
+# Brsapi Configuration (Requires API key)
+BRSAPI_API_KEY=your_brsapi_key_here
+BRSAPI_CACHE_ENABLED=true
+BRSAPI_CACHE_TTL=120
+
+# TGN Configuration (Requires username and API key)
+TGN_USERNAME=your_username
+TGN_API_KEY=your_tgn_api_key
+TGN_CACHE_ENABLED=true
+TGN_CACHE_TTL=120
 ```
 
 ## Basic Usage
 
-### 1. Get a Single Price
+### Get a Single Price
 
 ```php
 use JalalLinuX\PriceFeed\Facades\PriceFeed;
 use JalalLinuX\PriceFeed\Enums\Currency;
 
-// Using default driver
-$btcPrice = PriceFeed::getPrice(Currency::BTC);
-echo "BTC: $" . $btcPrice->price;
-
-// Using specific driver
-$ethPrice = PriceFeed::getPrice(Currency::ETH, 'binance');
-echo "ETH: $" . $ethPrice->price;
+// Get Bitcoin price
+$btcPrice = PriceFeed::price(Currency::BTC);
+echo $btcPrice->price; // 125000000.0
+echo $btcPrice->unit->value; // IRR
 ```
 
-### 2. Get Multiple Prices
+### Get Multiple Prices
 
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
-
-$prices = PriceFeed::getPrices([
+$prices = PriceFeed::prices([
     Currency::BTC,
     Currency::ETH,
-    Currency::USDT,
+    Currency::USD
 ]);
 
 foreach ($prices as $currency => $priceData) {
-    echo "{$currency}: $" . $priceData->price . "\n";
+    echo "{$currency}: {$priceData->price} {$priceData->unit->value}\n";
 }
 ```
 
-### 3. Access Detailed Information
+### Get All Supported Currencies
 
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
-
-$btc = PriceFeed::getPrice(Currency::BTC);
-
-echo "Price: $" . $btc->price . "\n";
-echo "24h Change: " . $btc->changePercentage24h . "%\n";
-echo "24h High: $" . $btc->high24h . "\n";
-echo "24h Low: $" . $btc->low24h . "\n";
-echo "Volume: $" . $btc->volume24h . "\n";
-echo "Market Cap: $" . $btc->marketCap . "\n";
+$currencies = PriceFeed::supportedCurrencies();
+// Returns array of Currency enum cases
 ```
 
-## Available Currencies
+## Using Different Drivers
 
-### Cryptocurrencies
-- BTC, ETH, USDT, BNB, XRP, ADA, DOGE, SOL, TRX, DOT, MATIC, LTC, SHIB, AVAX, UNI, LINK
-
-### Fiat Currencies
-- USD, EUR, GBP, JPY, CNY, AUD, CAD, CHF, IRR, AED, TRY
-
-### Precious Metals
-- GOLD, SILVER, PLATINUM, PALLADIUM
-
-## Available Drivers
-
-| Driver   | Asset Type | Requires API Key |
-|----------|------------|------------------|
-| `tgju`   | TGJU       | Yes |
-| `brsapi` | BRSAPI     | Yes |
-| `tgn`    | TGN        | Yes |
-
-## Common Tasks
-
-### Check Supported Currencies
+### TGJU Driver (Free)
 
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-
-$driver = PriceFeed::driver('binance');
-$currencies = $driver->getSupportedCurrencies();
-
-foreach ($currencies as $currency) {
-    echo $currency->value . "\n";
-}
+// TGJU provides fiat currencies and precious metals in IRR
+$usdPrice = PriceFeed::driver('tgju')->getPrice(Currency::USD);
+$goldPrice = PriceFeed::driver('tgju')->getPrice(Currency::IR_GOLD_18);
 ```
 
-### Check if Currency is Supported
+### Brsapi Driver (Requires API Key)
 
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
-
-$driver = PriceFeed::driver('binance');
-
-if ($driver->supports(Currency::BTC)) {
-    $price = $driver->getPrice(Currency::BTC);
-}
+// Brsapi provides cryptocurrencies, fiat currencies, and precious metals in IRT
+$btcPrice = PriceFeed::driver('brsapi')->getPrice(Currency::BTC);
+$ethPrice = PriceFeed::driver('brsapi')->getPrice(Currency::ETH);
 ```
 
-### Clear Cache
+### TGN Driver (Requires Credentials)
 
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
+// TGN provides fiat currencies and precious metals in IRT
+$usdPrice = PriceFeed::driver('tgn')->getPrice(Currency::USD);
+$goldPrice = PriceFeed::driver('tgn')->getPrice(Currency::GOLD_OUNCE);
+```
 
-// Clear specific currency cache
-PriceFeed::clearCache(Currency::BTC, 'coingecko');
+## Working with Price Data
 
-// Clear all cache for a driver
-PriceFeed::clearCache(driver: 'coingecko');
+### Accessing Price Information
+
+```php
+$priceData = PriceFeed::price(Currency::BTC);
+
+// Basic information
+echo $priceData->currency->value; // BTC
+echo $priceData->price; // 125000000.0
+echo $priceData->unit->value; // IRR
+echo $priceData->symbol; // BTC
+
+// Market data (if available)
+echo $priceData->change24h; // 2500000.0
+echo $priceData->changePercentage24h; // 2.04
+echo $priceData->high24h; // 130000000.0
+echo $priceData->low24h; // 120000000.0
+echo $priceData->volume24h; // 1500000000.0
+echo $priceData->marketCap; // 2500000000000.0
+
+// Timestamp
+echo $priceData->timestamp->format('Y-m-d H:i:s'); // 2024-01-15 14:30:00
+
+// Raw API data
+print_r($priceData->raw);
+```
+
+### Converting to Array
+
+```php
+$priceArray = $priceData->toArray();
+/*
+[
+    'currency' => 'BTC',
+    'price' => 125000000.0,
+    'unit' => 'IRR',
+    'symbol' => 'BTC',
+    'change24h' => 2500000.0,
+    'changePercentage24h' => 2.04,
+    'high24h' => 130000000.0,
+    'low24h' => 120000000.0,
+    'volume24h' => 1500000000.0,
+    'marketCap' => 2500000000000.0,
+    'timestamp' => '2024-01-15 14:30:00',
+    'raw' => [...]
+]
+*/
+```
+
+## Cache Management
+
+### Clear Specific Cache
+
+```php
+// Clear cache for specific currency
+PriceFeed::clearCache(Currency::BTC);
+
+// Clear cache for specific driver
+PriceFeed::clearCache(null, 'tgju');
 
 // Clear all cache
 PriceFeed::clearCache();
 ```
 
-### Convert to Array/JSON
+### Cache Configuration
+
+Each driver can have different cache settings:
 
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
-
-$btcPrice = PriceFeed::getPrice(Currency::BTC);
-
-// To array
-$array = $btcPrice->toArray();
-
-// To JSON
-$json = $btcPrice->toJson();
-
-// In API response (automatic serialization)
-return response()->json($btcPrice);
+// In config/price-feed.php
+'tgju' => [
+    'cache_enabled' => true,
+    'cache_ttl' => 120, // 2 minutes
+    'cache_prefix' => 'price_feed',
+],
 ```
 
 ## Error Handling
 
+### Catching Exceptions
+
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
 use JalalLinuX\PriceFeed\Exceptions\ApiException;
+use JalalLinuX\PriceFeed\Exceptions\DriverNotFoundException;
 use JalalLinuX\PriceFeed\Exceptions\UnsupportedCurrencyException;
 
 try {
-    $price = PriceFeed::getPrice(Currency::BTC, 'coingecko');
-
+    $price = PriceFeed::price(Currency::BTC);
 } catch (UnsupportedCurrencyException $e) {
-    // Currency not supported by this driver
-    echo "Currency not supported";
-
+    // Currency not supported by current driver
+    echo "Currency not supported: " . $e->getMessage();
+} catch (DriverNotFoundException $e) {
+    // Driver not found or not configured
+    echo "Driver not found: " . $e->getMessage();
 } catch (ApiException $e) {
     // API request failed
     echo "API error: " . $e->getMessage();
 }
 ```
 
-## Cache Configuration
+## Common Use Cases
 
-Edit `config/price-feed.php`:
+### 1. Display Current Prices
 
 ```php
-'cache' => [
-    'enabled' => true,           // Enable/disable caching
-    'ttl' => 60,                 // Cache duration in seconds
-    'prefix' => 'price_feed',    // Cache key prefix
-],
+public function index()
+{
+    $currencies = [
+        Currency::BTC,
+        Currency::ETH,
+        Currency::USD,
+        Currency::EUR
+    ];
+    
+    $prices = PriceFeed::prices($currencies);
+    
+    return view('prices.index', compact('prices'));
+}
 ```
 
-## Creating a Custom Driver
-
-1. Create a driver class:
+### 2. Price Comparison
 
 ```php
-namespace App\Drivers;
-
-use JalalLinuX\PriceFeed\Drivers\AbstractDriver;
-use JalalLinuX\PriceFeed\DataTransferObjects\PriceData;
-use JalalLinuX\PriceFeed\Enums\Currency;
-
-class MyCustomDriver extends AbstractDriver
+public function comparePrices()
 {
-    public function getPrice(Currency $currency): PriceData
-    {
-        $response = $this->getHttpClient()
-            ->get('/api/price/' . $currency->value);
+    $currency = Currency::BTC;
+    
+    $tgjuPrice = PriceFeed::driver('tgju')->getPrice($currency);
+    $brsapiPrice = PriceFeed::driver('brsapi')->getPrice($currency);
+    
+    return [
+        'tgju' => $tgjuPrice->price,
+        'brsapi' => $brsapiPrice->price,
+        'difference' => abs($tgjuPrice->price - $brsapiPrice->price)
+    ];
+}
+```
 
-        $data = $response->json();
+### 3. Price Alerts
 
-        return PriceData::from([
-            'currency' => $currency,
-            'price' => $data['price'],
-            'symbol' => $currency->value,
-            'timestamp' => now(),
-            'raw' => $data,
-        ]);
+```php
+public function checkPriceAlert(Currency $currency, float $threshold)
+{
+    $price = PriceFeed::price($currency);
+    
+    if ($price->price > $threshold) {
+        // Send alert
+        $this->sendAlert($currency, $price->price);
     }
 }
 ```
 
-2. Register in `config/price-feed.php`:
+### 4. Batch Processing
 
 ```php
+public function updateAllPrices()
+{
+    $currencies = PriceFeed::supportedCurrencies();
+    
+    foreach ($currencies as $currency) {
+        try {
+            $price = PriceFeed::price($currency);
+            $this->savePriceToDatabase($currency, $price);
+        } catch (Exception $e) {
+            Log::error("Failed to fetch price for {$currency->value}: " . $e->getMessage());
+        }
+    }
+}
+```
+
+## Configuration Examples
+
+### Full Configuration
+
+```php
+// config/price-feed.php
+return [
+    'default' => 'tgju',
+    
 'drivers' => [
-    'mycustom' => [
+        'tgju' => [
+            'driver' => \JalalLinuX\PriceFeed\Drivers\TgjuDriver::class,
+            'base_url' => 'https://call5.tgju.org',
+            'unit' => \JalalLinuX\PriceFeed\Enums\CurrencyUnit::IRR,
+            'cache_enabled' => true,
+            'cache_ttl' => 120,
+            'currencies' => [
+                Currency::USD,
+                Currency::EUR,
+                Currency::IR_GOLD_18,
+                // ... more currencies
+            ],
+            'options' => [
+                'timeout' => 10,
+            ],
+        ],
+        // ... other drivers
+    ],
+];
+```
+
+### Custom Driver Configuration
+
+```php
+// Add custom driver
+'my_custom_driver' => [
         'driver' => \App\Drivers\MyCustomDriver::class,
-        'api_key' => env('MYCUSTOM_API_KEY'),
-        'base_url' => 'https://api.mycustom.com',
+    'api_key' => env('MY_API_KEY'),
+    'base_url' => 'https://api.example.com',
+    'unit' => \JalalLinuX\PriceFeed\Enums\CurrencyUnit::USD,
+    'cache_enabled' => true,
+    'cache_ttl' => 300,
         'currencies' => [
             Currency::BTC,
             Currency::ETH,
         ],
         'options' => [
-            'timeout' => 10,
-        ],
+        'timeout' => 15,
     ],
 ],
 ```
 
-3. Use it:
+## Testing
+
+### Basic Test
 
 ```php
-$price = PriceFeed::getPrice(Currency::BTC, 'mycustom');
+use JalalLinuX\PriceFeed\Facades\PriceFeed;
+use JalalLinuX\PriceFeed\Enums\Currency;
+
+public function test_can_get_bitcoin_price()
+{
+    $price = PriceFeed::price(Currency::BTC);
+    
+    $this->assertInstanceOf(PriceData::class, $price);
+    $this->assertEquals(Currency::BTC, $price->currency);
+    $this->assertIsFloat($price->price);
+    $this->assertGreaterThan(0, $price->price);
+}
+```
+
+### Testing with Specific Driver
+
+```php
+public function test_tgju_driver_works()
+{
+    $driver = PriceFeed::driver('tgju');
+    $price = $driver->getPrice(Currency::USD);
+    
+    $this->assertInstanceOf(PriceData::class, $price);
+    $this->assertEquals(Currency::USD, $price->currency);
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Driver Not Found**
+   - Check driver configuration in `config/price-feed.php`
+   - Verify driver class exists and is properly namespaced
+
+2. **API Key Issues**
+   - Verify API keys are set in `.env` file
+   - Check API key validity with provider
+
+3. **Currency Not Supported**
+   - Check if currency is in driver's supported currencies list
+   - Verify currency mapping in driver implementation
+
+4. **Cache Issues**
+   - Clear cache: `PriceFeed::clearCache()`
+   - Check cache configuration
+   - Verify cache driver is working
+
+### Debug Mode
+
+Enable detailed error messages by setting:
+
+```env
+APP_DEBUG=true
+LOG_LEVEL=debug
 ```
 
 ## Next Steps
 
-- Read the full [README.md](README.md) for more details
-- Check [USAGE_EXAMPLES.md](USAGE_EXAMPLES.md) for advanced examples
-- Review [ARCHITECTURE.md](ARCHITECTURE.md) to understand the internals
-- Write tests for your implementation
+- Read the [Architecture Documentation](ARCHITECTURE.md) for advanced usage
+- Check the [API Reference](docs/) for detailed method documentation
+- Explore [Driver Documentation](docs/TGJU_DRIVER.md) for specific driver details
+- See [Examples](examples/) for more complex use cases
 
-## Getting Help
+## Support
 
-- 📖 [Documentation](README.md)
-- 💬 [GitHub Discussions](https://github.com/jalallinux/price-feed/discussions)
-- 🐛 [Report Issues](https://github.com/jalallinux/price-feed/issues)
-- 📧 Contact: smjjalalzadeh93@gmail.com
-
-## Example: Building a Simple Price Dashboard
-
-```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
-
-class PriceDashboard
-{
-    public function getCryptoPrices(): array
-    {
-        $cryptos = [
-            Currency::BTC,
-            Currency::ETH,
-            Currency::BNB,
-            Currency::XRP,
-        ];
-
-        $prices = PriceFeed::getPrices($cryptos);
-
-        $dashboard = [];
-        foreach ($prices as $currency => $priceData) {
-            $dashboard[] = [
-                'name' => $currency,
-                'price' => '$' . number_format($priceData->price, 2),
-                'change' => $priceData->changePercentage24h . '%',
-                'trend' => $priceData->changePercentage24h > 0 ? '↑' : '↓',
-                'volume' => '$' . $this->formatVolume($priceData->volume24h),
-            ];
-        }
-
-        return $dashboard;
-    }
-
-    private function formatVolume(?float $volume): string
-    {
-        if (!$volume) return 'N/A';
-
-        if ($volume >= 1_000_000_000) {
-            return number_format($volume / 1_000_000_000, 2) . 'B';
-        }
-        if ($volume >= 1_000_000) {
-            return number_format($volume / 1_000_000, 2) . 'M';
-        }
-        return number_format($volume, 2);
-    }
-}
-
-// Usage in a controller
-public function index()
-{
-    $dashboard = new PriceDashboard();
-    $prices = $dashboard->getCryptoPrices();
-
-    return view('dashboard', ['prices' => $prices]);
-}
-```
-
-## Example: Building a Price Alert
-
-```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
-use Illuminate\Support\Facades\Cache;
-
-class PriceAlertService
-{
-    public function checkAlert(Currency $currency, float $targetPrice): bool
-    {
-        $currentPrice = PriceFeed::getPrice($currency);
-
-        if ($currentPrice->price >= $targetPrice) {
-            // Send notification
-            $this->sendNotification($currency, $currentPrice->price, $targetPrice);
-            return true;
-        }
-
-        return false;
-    }
-
-    private function sendNotification(Currency $currency, float $current, float $target): void
-    {
-        // Implement your notification logic
-        \Log::info("Price Alert: {$currency->value} reached ${current} (target: ${target})");
-    }
-}
-
-// Setup in a scheduled job
-// app/Console/Kernel.php
-protected function schedule(Schedule $schedule)
-{
-    $schedule->call(function () {
-        $alertService = new PriceAlertService();
-        $alertService->checkAlert(Currency::BTC, 50000);
-    })->everyMinute();
-}
-```
-
-Happy coding! 🚀
+- [GitHub Issues](https://github.com/jalallinux/price-feed/issues)
+- [Documentation](https://github.com/jalallinux/price-feed#readme)
+- [Email Support](mailto:smjjalalzadeh93@gmail.com)

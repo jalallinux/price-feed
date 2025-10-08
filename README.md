@@ -1,50 +1,82 @@
 # Price Feed
 
-**Price Feed** is a Laravel package for fetching real-time prices of multiple asset types — including cryptocurrencies, fiat currencies, gold, silver, and metal derivatives — through a unified, driver-based architecture.
-
-Each driver connects to a third-party provider (such as TGJU, Brsapi, or TGN) and implements a shared interface. This makes it easy to extend, switch, or customize sources dynamically — all through Laravel's powerful configuration system.
-
----
-
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/jalallinux/price-feed.svg?style=flat-square)](https://packagist.org/packages/jalallinux/price-feed)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/jalallinux/price-feed/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/jalallinux/price-feed/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/jalallinux/price-feed/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/jalallinux/price-feed/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/jalallinux/price-feed.svg?style=flat-square)](https://packagist.org/packages/jalallinux/price-feed)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
----
+A comprehensive Laravel package for fetching real-time prices of multiple asset types including cryptocurrencies, fiat currencies, gold, silver, and precious metal derivatives through a unified driver-based architecture.
 
-## 🚀 Features
+## Features
 
-- 🧩 **Driver-based architecture** — Easily integrate multiple third-party providers.
-- ⚙️ **Dynamic configuration** — Define drivers and supported currencies from config files or database.
-- 💱 **Supports multiple asset types:**
-    - Cryptocurrencies (BTC, ETH, etc.)
-    - Fiat currencies (USD, EUR, IRR, etc.)
-    - Precious metals (Gold, Silver, etc.)
-- 🧠 **Unified interface** — All drivers implement a shared contract.
-- ⚡ **Real-time prices** — Fetch fresh rates using Laravel's `Http` facade.
-- 🧰 **Extensible design** — Build and register your own drivers easily.
-- 💾 **Smart caching** — Built-in per-driver caching to reduce API calls and improve performance.
+- **Multi-Asset Support**: Cryptocurrencies, fiat currencies, and precious metals
+- **Driver-Based Architecture**: Easily extensible with multiple data providers
+- **Built-in Caching**: Configurable caching with TTL support
+- **Type Safety**: Full PHP 8.4+ type safety with enums and DTOs
+- **Laravel Integration**: Seamless Laravel service provider and facade integration
+- **Multiple Providers**: Support for TGJU, Brsapi, and TGN APIs
+- **Comprehensive Testing**: Full test coverage with Pest PHP
 
----
+## Supported Assets
 
-## 🧭 Installation
+### Cryptocurrencies
+- Bitcoin (BTC), Ethereum (ETH), Tether (USDT)
+- Binance Coin (BNB), XRP, Cardano (ADA)
+- Dogecoin (DOGE), Solana (SOL), TRON (TRX)
+- Polkadot (DOT), Polygon (MATIC), Litecoin (LTC)
+- Shiba Inu (SHIB), Avalanche (AVAX)
+- Uniswap (UNI), Chainlink (LINK)
 
-Install the package via Composer:
+### Fiat Currencies
+- USD, EUR, GBP, JPY, CNY
+- AUD, CAD, CHF, IRR, AED, TRY
+
+### Precious Metals
+- Gold (various purities and forms)
+- Silver (999, 925, ounce)
+- Platinum, Palladium
+- Iranian Gold Coins (various denominations)
+
+## Installation
+
+You can install the package via Composer:
 
 ```bash
 composer require jalallinux/price-feed
 ```
 
-Publish and customize the configuration file:
+The package will automatically register its service provider and facade.
+
+## Configuration
+
+Publish the configuration file:
 
 ```bash
-php artisan vendor:publish --tag="price-feed-config"
+php artisan vendor:publish --provider="JalalLinuX\PriceFeed\PriceFeedServiceProvider" --tag="config"
 ```
 
----
+Configure your environment variables:
 
-## 🧪 Usage Example
+```env
+# Default driver
+PRICE_FEED_DRIVER=tgju
+
+# TGJU Configuration
+TGJU_CACHE_ENABLED=true
+TGJU_CACHE_TTL=120
+
+# Brsapi Configuration
+BRSAPI_API_KEY=your_api_key_here
+BRSAPI_CACHE_ENABLED=true
+BRSAPI_CACHE_TTL=120
+
+# TGN Configuration
+TGN_USERNAME=your_username
+TGN_API_KEY=your_api_key
+TGN_CACHE_ENABLED=true
+TGN_CACHE_TTL=120
+```
+
+## Usage
 
 ### Basic Usage
 
@@ -52,183 +84,155 @@ php artisan vendor:publish --tag="price-feed-config"
 use JalalLinuX\PriceFeed\Facades\PriceFeed;
 use JalalLinuX\PriceFeed\Enums\Currency;
 
-// Get Bitcoin price using the default driver
-$btcPrice = PriceFeed::getPrice(Currency::BTC);
-
-echo "BTC Price: $" . $btcPrice->price;
-echo "24h Change: " . $btcPrice->changePercentage24h . "%";
-echo "Volume: $" . $btcPrice->volume24h;
+// Get price for a single currency
+$btcPrice = PriceFeed::price(Currency::BTC);
 
 // Get prices for multiple currencies
-$prices = PriceFeed::getPrices([Currency::BTC, Currency::ETH, Currency::USDT]);
+$prices = PriceFeed::prices([
+    Currency::BTC,
+    Currency::ETH,
+    Currency::USD
+]);
 
-foreach ($prices as $currency => $priceData) {
-    echo "{$currency}: $" . $priceData->price . "\n";
-}
+// Get all supported currencies
+$supportedCurrencies = PriceFeed::supportedCurrencies();
+
+// Get available drivers
+$drivers = PriceFeed::availableDrivers();
 ```
 
 ### Using Specific Drivers
 
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
+// Use a specific driver
+$btcPrice = PriceFeed::driver('brsapi')->getPrice(Currency::BTC);
 
-// Get Bitcoin price from Brsapi (Iranian market)
-$btcPrice = PriceFeed::getPrice(Currency::BTC, 'brsapi');
-
-// Get USD price in IRR from TGJU (Iranian market)
-$usdIRR = PriceFeed::getPrice(Currency::USD, 'tgju');
-
-// Get USD price in IRR from TGN (Iranian market)
-$usdIRR = PriceFeed::getPrice(Currency::USD, 'tgn');
-
-// Get Ethereum price from Brsapi
-$ethPrice = PriceFeed::getPrice(Currency::ETH, 'brsapi');
+// Get prices from specific driver
+$prices = PriceFeed::driver('tgn')->getPrices([
+    Currency::USD,
+    Currency::EUR
+]);
 ```
 
-### Using Driver Instances
+### Working with Price Data
 
 ```php
-use JalalLinuX\PriceFeed\Facades\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
+$priceData = PriceFeed::price(Currency::BTC);
 
-// Get a driver instance
-$tgju = PriceFeed::driver('tgju');
-
-// Get supported currencies
-$supportedCurrencies = $tgju->getSupportedCurrencies();
-
-// Check if a currency is supported
-if ($tgju->supports(Currency::BTC)) {
-    $price = $tgju->getPrice(Currency::BTC);
-}
+echo $priceData->currency->value; // BTC
+echo $priceData->price; // 125000000.0
+echo $priceData->unit->value; // IRR
+echo $priceData->symbol; // BTC
+echo $priceData->change24h; // 2500000.0
+echo $priceData->changePercentage24h; // 2.04
+echo $priceData->high24h; // 130000000.0
+echo $priceData->low24h; // 120000000.0
+echo $priceData->timestamp->format('Y-m-d H:i:s'); // 2024-01-15 14:30:00
 ```
 
-### Cache Configuration
-
-The package includes built-in caching to reduce API calls and improve performance. Each driver can have its own cache settings:
-
-**Environment Variables:**
-
-```env
-# Enable/disable caching per driver
-BRSAPI_CACHE_ENABLED=true
-BRSAPI_CACHE_TTL=120
-
-TGJU_CACHE_ENABLED=true
-TGJU_CACHE_TTL=120
-
-TGN_CACHE_ENABLED=true
-TGN_CACHE_TTL=120
-
-TGN_USERNAME=
-TGN_API_KEY=
-TGN_CACHE_TTL=120
-```
-
-**Benefits:**
-- ✅ Reduces API calls significantly (e.g., fetching 100 currencies makes only 1 API call for TGJU)
-- ✅ Improves response time for repeated requests
-- ✅ Helps avoid hitting API rate limits
-- ✅ Per-driver TTL allows custom caching strategies for different data sources
-
-### Helper Methods
+### Cache Management
 
 ```php
-use JalalLinuX\PriceFeed\PriceFeed;
-use JalalLinuX\PriceFeed\Enums\Currency;
+// Clear cache for specific currency
+PriceFeed::clearCache(Currency::BTC);
 
-// Get available drivers
-$drivers = PriceFeed::availableDrivers();
+// Clear cache for specific driver
+PriceFeed::clearCache(null, 'tgju');
 
-// Get supported currencies for default driver
-$currencies = PriceFeed::supportedCurrencies();
+// Clear all cache
+PriceFeed::clearCache();
 ```
 
-### Creating Custom Drivers
+## Available Drivers
 
-You can create your own driver by extending the `AbstractDriver` or implementing the `DriverInterface`:
+### TGJU Driver
+- **Provider**: TGJU (Tehran Gold and Jewelry Union)
+- **Coverage**: Fiat currencies, precious metals
+- **Unit**: Iranian Rial (IRR)
+- **Authentication**: None required
+- **API**: Free public API
 
-```php
-namespace App\PriceFeed\Drivers;
+### Brsapi Driver
+- **Provider**: Brsapi.ir
+- **Coverage**: Cryptocurrencies, fiat currencies, precious metals
+- **Unit**: Iranian Toman (IRT)
+- **Authentication**: API key required
+- **API**: Commercial API
 
-use JalalLinuX\PriceFeed\Drivers\AbstractDriver;
-use JalalLinuX\PriceFeed\DataTransferObjects\PriceData;
-use JalalLinuX\PriceFeed\Enums\Currency;
+### TGN Driver
+- **Provider**: TGN Services
+- **Coverage**: Fiat currencies, precious metals, coins
+- **Unit**: Iranian Toman (IRT)
+- **Authentication**: Username and API key required
+- **API**: Commercial API
 
-class MyCustomDriver extends AbstractDriver
-{
-    public function getPrice(Currency $currency): PriceData
-    {
-        // Fetch data from your source using HTTP client
-        $response = $this->getHttpClient()
-            ->get('/api/price', [
-                'symbol' => $currency->value,
-            ]);
+## Configuration Reference
 
-        $data = $response->json();
-
-        return PriceData::from([
-            'currency' => $currency,
-            'price' => $data['price'],
-            'symbol' => $currency->value,
-            'change_24h' => $data['change_24h'] ?? null,
-            'change_percentage_24h' => $data['change_percentage_24h'] ?? null,
-            'volume_24h' => $data['volume'] ?? null,
-            'timestamp' => now(),
-            'raw' => $data,
-        ]);
-    }
-}
-```
-
-Then register it in your config:
+The package configuration is located in `config/price-feed.php`:
 
 ```php
-'drivers' => [
-    'custom' => [
-        'driver' => App\PriceFeed\Drivers\MyCustomDriver::class,
-        'api_key' => env('CUSTOM_API_KEY'),
-        'base_url' => 'https://api.custom.com',
-        'currencies' => [
-            Currency::BTC,
-            Currency::ETH,
+return [
+    'default' => env('PRICE_FEED_DRIVER', 'tgju'),
+    
+    'drivers' => [
+        'tgju' => [
+            'driver' => \JalalLinuX\PriceFeed\Drivers\TgjuDriver::class,
+            'base_url' => 'https://call5.tgju.org',
+            'unit' => \JalalLinuX\PriceFeed\Enums\CurrencyUnit::IRR,
+            'cache_enabled' => true,
+            'cache_ttl' => 120,
+            'currencies' => [
+                // Configured currencies
+            ],
         ],
-        'options' => [
-            'timeout' => 10,
-        ],
+        // Other drivers...
     ],
-],
+];
 ```
 
----
+## Testing
 
-## 🧰 Testing
-
-Run the tests using:
+Run the tests with:
 
 ```bash
 composer test
 ```
 
----
+Run tests with coverage:
 
-## 🧱 Contributing
+```bash
+composer test-coverage
+```
 
-Contributions are welcome! Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+## Code Quality
 
----
+Format code with Laravel Pint:
 
-## 🔒 Security
+```bash
+composer format
+```
 
-Please review [our security policy](../../security/policy) for how to report vulnerabilities.
+## Changelog
 
----
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
-## 🪪 License
+## Contributing
 
-The MIT License (MIT). See [License File](LICENSE.md) for more information.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
----
+## Security
 
-**Developed by [JalalLinuX](https://github.com/jalallinux)**
+If you discover any security related issues, please email smjjalalzadeh93@gmail.com instead of using the issue tracker.
+
+## Credits
+
+- [JalalLinuX](https://github.com/jalallinux)
+- [All Contributors](../../contributors)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
+## Support
+
+If you find this package useful, please consider starring it on GitHub and sharing it with others!
